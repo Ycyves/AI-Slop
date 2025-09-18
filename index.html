@@ -1,425 +1,409 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atom Builder Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #game {
+            width: 800px;
+            margin: 0 auto;
+        }
+        .element {
+            font-size: 28px;
+            margin: 20px 0;
+            color: #333;
+        }
+        #buckets {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .bucket {
+            border: 2px solid #333;
+            width: 200px;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+        .bucket h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        .particles {
+            height: 300px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: flex-start;
+        }
+        .particle {
+            width: 15px;
+            height: 15px;
+            margin: 2px;
+            border-radius: 50%;
+            cursor: move;
+        }
+        .proton {
+            background: red;
+        }
+        .neutron {
+            background: gray;
+        }
+        .electron {
+            background: blue;
+        }
+        .atom-zone {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border: 2px solid #333;
+            margin: 20px auto;
+            background: #fff;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .cross {
+            position: absolute;
+            left: 200px;
+            top: 200px;
+            width: 0;
+            height: 0;
+            z-index: 10;
+        }
+        .cross::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            background: black;
+            left: -10px;
+            top: -1px;
+        }
+        .cross::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: black;
+            left: -1px;
+            top: -10px;
+        }
+        .shells {
+            position: absolute;
+            left: 200px;
+            top: 200px;
+            transform: translate(-50%, -50%);
+            border: 1px dashed gray;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .nucleus {
+            position: absolute;
+            left: 200px;
+            top: 200px;
+            transform: translate(-50%, -50%);
+            border: 1px solid #666;
+            border-radius: 50%;
+            background: rgba(100,100,100,0.3);
+            z-index: 2;
+        }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Atom Builder Game&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: Arial, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#game {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 800px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 auto;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.element {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 28px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 20px 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #333;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#buckets {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: space-around;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.bucket {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #333;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 200px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #f9f9f9;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.bucket h3 {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 0 10px 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.particles {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 300px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-content: flex-start;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.particle {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 2px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: move;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.proton {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: red;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.neutron {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: gray;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.electron {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: blue;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.atom-zone {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 400px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 400px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #333;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 20px auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #fff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: inline-block;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>vertical-align: top;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.cross {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: 200px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 200px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 10;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.cross::before {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>content: '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 2px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: black;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: -10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: -1px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.cross::after {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>content: '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 2px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: black;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: -1px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: -10px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.shells {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: 200px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 200px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translate(-50%, -50%);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px dashed gray;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 1;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.nucleus {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: 200px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 200px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translate(-50%, -50%);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid #666;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: rgba(100,100,100,0.3);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 2;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="game"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="buckets"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="bucket"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3&gt;Protons&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="particles" id="p-bucket"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="bucket"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3&gt;Neutrons&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="particles" id="n-bucket"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="bucket"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3&gt;Electrons&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="particles" id="e-bucket"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1 class="element" id="element1"&gt;No Element&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="atom-zone1" class="atom-zone" ondrop="drop(event,1)" ondragover="allowDrop(event)"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="cross"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="nucleus1" class="nucleus"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="shell1_1" class="shells"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="shell2_1" class="shells"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="shell3_1" class="shells"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1 class="element" id="element2"&gt;No Element&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="atom-zone2" class="atom-zone" ondrop="drop(event,2)" ondragover="allowDrop(event)"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="cross"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="nucleus2" class="nucleus"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="shell1_2" class="shells"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="shell2_2" class="shells"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="shell3_2" class="shells"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const elements = {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>1: 'Hydrogen',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>2: 'Helium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>3: 'Lithium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>4: 'Beryllium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>5: 'Boron',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>6: 'Carbon',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>7: 'Nitrogen',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>8: 'Oxygen',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>9: 'Fluorine',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>10: 'Neon',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>11: 'Sodium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>12: 'Magnesium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>13: 'Aluminium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>14: 'Silicon',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>15: 'Phosphorus',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>16: 'Sulfur',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>17: 'Chlorine',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>18: 'Argon',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>19: 'Potassium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>20: 'Calcium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>21: 'Scandium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>22: 'Titanium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>23: 'Vanadium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>24: 'Chromium',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>25: 'Manganese',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>26: 'Iron',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>27: 'Cobalt',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>28: 'Nickel',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>29: 'Copper',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>30: 'Zinc'</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>let protons = [0, 0];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let neutrons = [0, 0];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let electrons = [0, 0];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Populate buckets with 30 of each</p>
-<p class="p1"><span class="Apple-converted-space">        </span>for (let i = 0; i &lt; 30; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Protons</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let p = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>p.id = 'p' + i;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>p.className = 'particle proton';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>p.draggable = true;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>p.ondragstart = drag;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('p-bucket').appendChild(p);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Neutrons</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let n = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>n.id = 'n' + i;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>n.className = 'particle neutron';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>n.draggable = true;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>n.ondragstart = drag;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('n-bucket').appendChild(n);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Electrons</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let e = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>e.id = 'e' + i;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>e.className = 'particle electron';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>e.draggable = true;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>e.ondragstart = drag;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('e-bucket').appendChild(e);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function drag(ev) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ev.dataTransfer.setData("text", ev.target.id);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function allowDrop(ev) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ev.preventDefault();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function drop(ev, zoneId) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ev.preventDefault();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const id = ev.dataTransfer.getData("text");</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const dragged = document.getElementById(id);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const atomZone = document.getElementById(`atom-zone${zoneId}`);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const index = zoneId - 1;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (dragged.classList.contains('proton')) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>protons[index]++;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>placeNearCenter(dragged);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>updateElement(zoneId);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>updateShells(zoneId);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>updateNucleusPositions(zoneId);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>updateNucleusSize(zoneId);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else if (dragged.classList.contains('neutron')) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>neutrons[index]++;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>placeNearCenter(dragged);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>updateNucleusPositions(zoneId);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>updateNucleusSize(zoneId);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else if (dragged.classList.contains('electron')) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>electrons[index]++;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>placeInShell(dragged);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>updateElectronPositions(zoneId);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Remove from original parent and append to atom zone</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dragged.parentNode.removeChild(dragged);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>atomZone.appendChild(dragged);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function placeNearCenter(el) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.position = 'absolute';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.width = '6px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.height = '6px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.borderRadius = '50%';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.left = '197px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.top = '197px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.margin = '0';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function placeInShell(el) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.position = 'absolute';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.width = '5px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.height = '5px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.borderRadius = '50%';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.left = '197.5px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.top = '197.5px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.margin = '0';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function setPos(el, x, y, half = 2.5) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.left = (x - half) + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>el.style.top = (y - half) + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function updateElement(zoneId) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const index = zoneId - 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const el = document.getElementById(`element${zoneId}`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const p = protons[index];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (p in elements) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>el.innerHTML = elements[p];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>el.innerHTML = `Element ${p}`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function updateShells(zoneId) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const index = zoneId - 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const p = Math.max(1, protons[index]);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const scale1 = Math.pow(p, -0.6);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const scale2 = Math.pow(p, -0.4);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const scale3 = Math.pow(p, -0.3);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const r1 = 50 * scale1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const r2 = 150 * scale2;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const r3 = 250 * scale3;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const shell1 = document.getElementById(`shell1_${zoneId}`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const shell2 = document.getElementById(`shell2_${zoneId}`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const shell3 = document.getElementById(`shell3_${zoneId}`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>shell1.style.width = (2 * r1) + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>shell1.style.height = (2 * r1) + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>shell2.style.width = (2 * r2) + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>shell2.style.height = (2 * r2) + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>shell3.style.width = (2 * r3) + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>shell3.style.height = (2 * r3) + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function updateNucleusSize(zoneId) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const index = zoneId - 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const nucleons = protons[index] + neutrons[index];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const size = Math.max(10, 10 + Math.sqrt(nucleons) * 5);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const nucleus = document.getElementById(`nucleus${zoneId}`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>nucleus.style.width = size + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>nucleus.style.height = size + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function updateNucleusPositions(zoneId) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const index = zoneId - 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const nuc_els = document.querySelectorAll(`#atom-zone${zoneId} .proton, #atom-zone${zoneId} .neutron`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const nucleons = protons[index] + neutrons[index];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const nuc_radius = Math.max(5, 3 + Math.sqrt(nucleons) * 2);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; nuc_els.length; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const angle = Math.random() * 2 * Math.PI;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const r = Math.random() * nuc_radius;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const x = 200 + r * Math.cos(angle);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const y = 200 + r * Math.sin(angle);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>setPos(nuc_els[i], x, y, 3);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function updateElectronPositions(zoneId) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const index = zoneId - 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const numElectrons = electrons[index];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (numElectrons === 0) return;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const els = document.querySelectorAll(`#atom-zone${zoneId} .electron`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const shell1 = document.getElementById(`shell1_${zoneId}`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const shell2 = document.getElementById(`shell2_${zoneId}`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const shell3 = document.getElementById(`shell3_${zoneId}`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const radius1 = shell1.offsetWidth / 2;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const radius2 = shell2.offsetWidth / 2;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const radius3 = shell3.offsetWidth / 2;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const max1 = 2;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const max2 = 8;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const inShell1 = Math.min(numElectrons, max1);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const inShell2 = Math.min(Math.max(0, numElectrons - max1), max2);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const inShell3 = Math.max(0, numElectrons - max1 - max2);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>let idx = 0;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Shell 1</p>
-<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; inShell1; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let angle = 0;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (inShell1 &gt; 1) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>angle = 2 * Math.PI * i / inShell1;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>angle += (Math.random() * 0.2 - 0.1);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const r = radius1 * (0.9 + Math.random() * 0.2);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const x = 200 + r * Math.cos(angle);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const y = 200 + r * Math.sin(angle);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>setPos(els[idx], x, y);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>idx++;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Shell 2</p>
-<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; inShell2; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let angle = 0;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (inShell2 &gt; 1) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>angle = 2 * Math.PI * i / inShell2;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>angle += (Math.random() * 0.2 - 0.1);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const r = radius2 * (0.9 + Math.random() * 0.2);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const x = 200 + r * Math.cos(angle);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const y = 200 + r * Math.sin(angle);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>setPos(els[idx], x, y);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>idx++;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Shell 3</p>
-<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; inShell3; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let angle = 0;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (inShell3 &gt; 1) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>angle = 2 * Math.PI * i / inShell3;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>angle += (Math.random() * 0.2 - 0.1);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const r = radius3 * (0.9 + Math.random() * 0.2);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const x = 200 + r * Math.cos(angle);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const y = 200 + r * Math.sin(angle);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>setPos(els[idx], x, y);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>idx++;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Initial setup</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function initZone(zoneId) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>updateShells(zoneId);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>updateNucleusSize(zoneId);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>updateElement(zoneId);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>initZone(1);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>initZone(2);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+    <div id="game">
+        <div id="buckets">
+            <div class="bucket">
+                <h3>Protons</h3>
+                <div class="particles" id="p-bucket"></div>
+            </div>
+            <div class="bucket">
+                <h3>Neutrons</h3>
+                <div class="particles" id="n-bucket"></div>
+            </div>
+            <div class="bucket">
+                <h3>Electrons</h3>
+                <div class="particles" id="e-bucket"></div>
+            </div>
+        </div>
+
+        <h1 class="element" id="element1">No Element</h1>
+        <div id="atom-zone1" class="atom-zone" ondrop="drop(event,1)" ondragover="allowDrop(event)">
+            <div class="cross"></div>
+            <div id="nucleus1" class="nucleus"></div>
+            <div id="shell1_1" class="shells"></div>
+            <div id="shell2_1" class="shells"></div>
+            <div id="shell3_1" class="shells"></div>
+        </div>
+
+        <h1 class="element" id="element2">No Element</h1>
+        <div id="atom-zone2" class="atom-zone" ondrop="drop(event,2)" ondragover="allowDrop(event)">
+            <div class="cross"></div>
+            <div id="nucleus2" class="nucleus"></div>
+            <div id="shell1_2" class="shells"></div>
+            <div id="shell2_2" class="shells"></div>
+            <div id="shell3_2" class="shells"></div>
+        </div>
+    </div>
+
+    <script>
+        const elements = {
+            1: 'Hydrogen',
+            2: 'Helium',
+            3: 'Lithium',
+            4: 'Beryllium',
+            5: 'Boron',
+            6: 'Carbon',
+            7: 'Nitrogen',
+            8: 'Oxygen',
+            9: 'Fluorine',
+            10: 'Neon',
+            11: 'Sodium',
+            12: 'Magnesium',
+            13: 'Aluminium',
+            14: 'Silicon',
+            15: 'Phosphorus',
+            16: 'Sulfur',
+            17: 'Chlorine',
+            18: 'Argon',
+            19: 'Potassium',
+            20: 'Calcium',
+            21: 'Scandium',
+            22: 'Titanium',
+            23: 'Vanadium',
+            24: 'Chromium',
+            25: 'Manganese',
+            26: 'Iron',
+            27: 'Cobalt',
+            28: 'Nickel',
+            29: 'Copper',
+            30: 'Zinc'
+        };
+
+        let protons = [0, 0];
+        let neutrons = [0, 0];
+        let electrons = [0, 0];
+
+        // Populate buckets with 30 of each
+        for (let i = 0; i < 30; i++) {
+            // Protons
+            let p = document.createElement('div');
+            p.id = 'p' + i;
+            p.className = 'particle proton';
+            p.draggable = true;
+            p.ondragstart = drag;
+            document.getElementById('p-bucket').appendChild(p);
+
+            // Neutrons
+            let n = document.createElement('div');
+            n.id = 'n' + i;
+            n.className = 'particle neutron';
+            n.draggable = true;
+            n.ondragstart = drag;
+            document.getElementById('n-bucket').appendChild(n);
+
+            // Electrons
+            let e = document.createElement('div');
+            e.id = 'e' + i;
+            e.className = 'particle electron';
+            e.draggable = true;
+            e.ondragstart = drag;
+            document.getElementById('e-bucket').appendChild(e);
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drop(ev, zoneId) {
+            ev.preventDefault();
+            const id = ev.dataTransfer.getData("text");
+            const dragged = document.getElementById(id);
+            const atomZone = document.getElementById(`atom-zone${zoneId}`);
+
+            const index = zoneId - 1;
+
+            if (dragged.classList.contains('proton')) {
+                protons[index]++;
+                placeNearCenter(dragged);
+                updateElement(zoneId);
+                updateShells(zoneId);
+                updateNucleusPositions(zoneId);
+                updateNucleusSize(zoneId);
+            } else if (dragged.classList.contains('neutron')) {
+                neutrons[index]++;
+                placeNearCenter(dragged);
+                updateNucleusPositions(zoneId);
+                updateNucleusSize(zoneId);
+            } else if (dragged.classList.contains('electron')) {
+                electrons[index]++;
+                placeInShell(dragged);
+                updateElectronPositions(zoneId);
+            }
+
+            // Remove from original parent and append to atom zone
+            dragged.parentNode.removeChild(dragged);
+            atomZone.appendChild(dragged);
+        }
+
+        function placeNearCenter(el) {
+            el.style.position = 'absolute';
+            el.style.width = '6px';
+            el.style.height = '6px';
+            el.style.borderRadius = '50%';
+            el.style.left = '197px';
+            el.style.top = '197px';
+            el.style.margin = '0';
+        }
+
+        function placeInShell(el) {
+            el.style.position = 'absolute';
+            el.style.width = '5px';
+            el.style.height = '5px';
+            el.style.borderRadius = '50%';
+            el.style.left = '197.5px';
+            el.style.top = '197.5px';
+            el.style.margin = '0';
+        }
+
+        function setPos(el, x, y, half = 2.5) {
+            el.style.left = (x - half) + 'px';
+            el.style.top = (y - half) + 'px';
+        }
+
+        function updateElement(zoneId) {
+            const index = zoneId - 1;
+            const el = document.getElementById(`element${zoneId}`);
+            const p = protons[index];
+            if (p in elements) {
+                el.innerHTML = elements[p];
+            } else {
+                el.innerHTML = `Element ${p}`;
+            }
+        }
+
+        function updateShells(zoneId) {
+            const index = zoneId - 1;
+            const p = Math.max(1, protons[index]);
+            const scale1 = Math.pow(p, -0.6);
+            const scale2 = Math.pow(p, -0.4);
+            const scale3 = Math.pow(p, -0.3);
+            const r1 = 50 * scale1;
+            const r2 = 150 * scale2;
+            const r3 = 250 * scale3;
+            const shell1 = document.getElementById(`shell1_${zoneId}`);
+            const shell2 = document.getElementById(`shell2_${zoneId}`);
+            const shell3 = document.getElementById(`shell3_${zoneId}`);
+            shell1.style.width = (2 * r1) + 'px';
+            shell1.style.height = (2 * r1) + 'px';
+            shell2.style.width = (2 * r2) + 'px';
+            shell2.style.height = (2 * r2) + 'px';
+            shell3.style.width = (2 * r3) + 'px';
+            shell3.style.height = (2 * r3) + 'px';
+        }
+
+        function updateNucleusSize(zoneId) {
+            const index = zoneId - 1;
+            const nucleons = protons[index] + neutrons[index];
+            const size = Math.max(10, 10 + Math.sqrt(nucleons) * 5);
+            const nucleus = document.getElementById(`nucleus${zoneId}`);
+            nucleus.style.width = size + 'px';
+            nucleus.style.height = size + 'px';
+        }
+
+        function updateNucleusPositions(zoneId) {
+            const index = zoneId - 1;
+            const nuc_els = document.querySelectorAll(`#atom-zone${zoneId} .proton, #atom-zone${zoneId} .neutron`);
+            const nucleons = protons[index] + neutrons[index];
+            const nuc_radius = Math.max(5, 3 + Math.sqrt(nucleons) * 2);
+            for (let i = 0; i < nuc_els.length; i++) {
+                const angle = Math.random() * 2 * Math.PI;
+                const r = Math.random() * nuc_radius;
+                const x = 200 + r * Math.cos(angle);
+                const y = 200 + r * Math.sin(angle);
+                setPos(nuc_els[i], x, y, 3);
+            }
+        }
+
+        function updateElectronPositions(zoneId) {
+            const index = zoneId - 1;
+            const numElectrons = electrons[index];
+            if (numElectrons === 0) return;
+
+            const els = document.querySelectorAll(`#atom-zone${zoneId} .electron`);
+            const shell1 = document.getElementById(`shell1_${zoneId}`);
+            const shell2 = document.getElementById(`shell2_${zoneId}`);
+            const shell3 = document.getElementById(`shell3_${zoneId}`);
+            const radius1 = shell1.offsetWidth / 2;
+            const radius2 = shell2.offsetWidth / 2;
+            const radius3 = shell3.offsetWidth / 2;
+
+            const max1 = 2;
+            const max2 = 8;
+            const inShell1 = Math.min(numElectrons, max1);
+            const inShell2 = Math.min(Math.max(0, numElectrons - max1), max2);
+            const inShell3 = Math.max(0, numElectrons - max1 - max2);
+
+            let idx = 0;
+
+            // Shell 1
+            for (let i = 0; i < inShell1; i++) {
+                let angle = 0;
+                if (inShell1 > 1) {
+                    angle = 2 * Math.PI * i / inShell1;
+                }
+                angle += (Math.random() * 0.2 - 0.1);
+                const r = radius1 * (0.9 + Math.random() * 0.2);
+                const x = 200 + r * Math.cos(angle);
+                const y = 200 + r * Math.sin(angle);
+                setPos(els[idx], x, y);
+                idx++;
+            }
+
+            // Shell 2
+            for (let i = 0; i < inShell2; i++) {
+                let angle = 0;
+                if (inShell2 > 1) {
+                    angle = 2 * Math.PI * i / inShell2;
+                }
+                angle += (Math.random() * 0.2 - 0.1);
+                const r = radius2 * (0.9 + Math.random() * 0.2);
+                const x = 200 + r * Math.cos(angle);
+                const y = 200 + r * Math.sin(angle);
+                setPos(els[idx], x, y);
+                idx++;
+            }
+
+            // Shell 3
+            for (let i = 0; i < inShell3; i++) {
+                let angle = 0;
+                if (inShell3 > 1) {
+                    angle = 2 * Math.PI * i / inShell3;
+                }
+                angle += (Math.random() * 0.2 - 0.1);
+                const r = radius3 * (0.9 + Math.random() * 0.2);
+                const x = 200 + r * Math.cos(angle);
+                const y = 200 + r * Math.sin(angle);
+                setPos(els[idx], x, y);
+                idx++;
+            }
+        }
+
+        // Initial setup
+        function initZone(zoneId) {
+            updateShells(zoneId);
+            updateNucleusSize(zoneId);
+            updateElement(zoneId);
+        }
+        initZone(1);
+        initZone(2);
+    </script>
 </body>
 </html>
